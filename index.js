@@ -337,6 +337,50 @@ app.get('/aggri', async (req, res) => {
       res.send(result);
     })
 
+    // // mixaup all   movie and episode get
+
+    app.get('/allDatas', async (req, res) => {
+      try {
+        const searchQuery = req.query.searchQuery;
+        let query = {};
+
+        // If a search query is provided, add a regex condition to search by title
+        if (searchQuery) {
+          query = { title: { $regex: new RegExp(searchQuery, 'i') } };
+        }
+
+        // Create aggregation pipelines for each collection
+        const moviesPipeline = [
+          { $match: query },
+          { $sort: { _id: -1 } } // Sort by _id field in descending order
+        ];
+
+        const showsPipeline = [
+          { $match: query },
+          { $sort: { _id: -1 } } // Sort by _id field in descending order
+        ];
+
+        // Perform aggregation on each collection
+        const moviesCursor = moviesCollection.aggregate(moviesPipeline);
+        const showsCursor = showsCollection.aggregate(showsPipeline);
+
+        // Wait for all aggregations to complete
+        const [moviesResult, showsResult] = await Promise.all([
+          moviesCursor.toArray(),
+          showsCursor.toArray()
+        ]);
+
+        // Combine the results from all collections into a single array
+        const combinedResult = [...moviesResult, ...showsResult];
+
+        // Send the combined result as the response
+        res.send(combinedResult);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+      }
+    });
+
 
     
     

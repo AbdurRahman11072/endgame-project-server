@@ -56,7 +56,7 @@ async function run() {
     const celebrityCollection = client.db("celebrityDB").collection("celebrities");
     const ratingCollection = client.db("LiveStriming").collection("rating");
     const commentsCollection = client.db("LiveStriming").collection("comments");
-   
+
     const packagesCollection = client.db("LiveStriming").collection("packages");
     const likeCollection = client.db("LiveStriming").collection("Like");
     const playListCollection = client.db("LiveStriming").collection("playlist")
@@ -1123,7 +1123,7 @@ async function run() {
     app.get('/notifications/read', async (req, res) => {
       const query = req.query?.email;
 
-      const checkUser = notificationsCollection.find({ type: { $in: ["video", "message"] } }).sort({ notifyPostTime: -1 });
+      const checkUser = notificationsCollection.find({ type: { $in: ["video", "message", "episode"] } }).sort({ notifyPostTime: -1 });
       const result = await checkUser.toArray();
       res.send(result);
     });
